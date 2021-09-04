@@ -16,8 +16,14 @@ public class Demo {
 
     @Test
     public void demo2() {
-        for (int i = 0; i < 10; i++) {
-            new Thread(SingletonDemo::getInstance, String.valueOf(i)).start();
+        for (int i = 0; i < 10000; i++) {
+            new Thread(() -> {
+                SingletonDemo.getInstance();
+            }, String.valueOf(i)).start();
+        }
+
+        while (Thread.activeCount() > 2) {
+            Thread.yield();
         }
         //结果
         //可能输出一次，也可能输出多次
@@ -25,8 +31,14 @@ public class Demo {
 
     @Test
     public void demo3() {
-        for (int i = 0; i < 10; i++) {
-            new Thread(SingletonDemo::getInstance2, String.valueOf(i)).start();
+        for (int i = 0; i < 10000; i++) {
+            new Thread(() -> {
+                SingletonDemo.getInstance2();
+            }, String.valueOf(i)).start();
+        }
+
+        while (Thread.activeCount() > 2) {
+            Thread.yield();
         }
         //结果
         //只会输出一次
@@ -34,8 +46,14 @@ public class Demo {
 
     @Test
     public void demo4() {
-        for (int i = 0; i < 10; i++) {
-            new Thread(SingletonDemo::getInstance3, String.valueOf(i)).start();
+        for (int i = 0; i < 10000; i++) {
+            new Thread(() -> {
+                SingletonDemo.getInstance3();
+            }, String.valueOf(i)).start();
+        }
+
+        while (Thread.activeCount() > 2) {
+            Thread.yield();
         }
         //结果
         //只会输出一次
