@@ -17,7 +17,7 @@ public class VolatileDemo {
             System.out.println(Thread.currentThread().getName() + "开始执行");
             //睡眠
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -37,7 +37,7 @@ public class VolatileDemo {
         //这里子线程工作内存和主内存里的number都变成了60，但主线程的工作内存还是0，所以一直在循环
         //2. number变量有volatile修饰
         //子线程修改了number的值并写到主内存时，会通知其他线程更新number的值
-        System.out.println(Thread.currentThread().getName());
+        System.out.println(Thread.currentThread().getName() + "变量 " + data.number);
     }
 
     //不保证可见性
@@ -46,11 +46,12 @@ public class VolatileDemo {
         MyData data = new MyData();
 
         //创建10个线程
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             new Thread(() -> {
                 //每个线程调用1000次自增
                 for (int j = 0; j < 1000; j++) {
                     data.autoIncrease();
+                    data.myAtomicIncrease();
                 }
             }).start();
         }
@@ -64,7 +65,7 @@ public class VolatileDemo {
         }
 
         //第一次执行输出9165
-        System.out.println(data.number);
+        System.out.println(Thread.currentThread().getName() + " number :" + data.number + " atomicInteger " + data.atomicInteger);
     }
 
     //指令重排造成错误的示例

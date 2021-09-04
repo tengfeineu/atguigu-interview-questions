@@ -9,7 +9,7 @@ public class MyData {
 
     //不需要声明volatile，难道自己就能保证可见性？
     //不初始化的情况下，初始值为0
-    AtomicInteger atomicInteger;
+    AtomicInteger atomicInteger = new AtomicInteger();
     //有两个方法getAndAdd()，getAndIncrement()。第二个方法其实就是调用了第一个方法，参数为1
 
     public void turnTo60() {
@@ -18,5 +18,9 @@ public class MyData {
 
     public void autoIncrease() {
         number++;
+    }
+
+    public void myAtomicIncrease() {
+        atomicInteger.getAndIncrement();
     }
 }
