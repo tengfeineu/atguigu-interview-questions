@@ -4,8 +4,44 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class ListDemo {
+
+    public static void main(String[] args) {
+        //List<String> list = new ArrayList<>();
+        //List<String> list = new Vector<>();
+        //List<String> list = Collections.synchronizedList(new ArrayList<>());
+        List<String> list = new CopyOnWriteArrayList<>();
+        for (int i = 0; i <= 30; i++) {
+            new Thread(() -> {
+                list.add(UUID.randomUUID().toString().substring(0, 8));
+                System.out.println(list);
+            }, String.valueOf(i)).start();
+        }
+
+        // 多次运行会出现 java.util.ConcurrentModificationException
+    }
+
+    //演示集合类的并发安全问题
+    @Test
+    public void demo() throws InterruptedException {
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            try {
+                CountDownLatch countDownLatch = new CountDownLatch(1);
+                Thread thread = new Thread(() -> {
+                    list.add(UUID.randomUUID().toString().substring(0, 8));
+                    System.out.println("当前list: " + list);
+                    countDownLatch.countDown();
+                });
+                thread.start();
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     //演示集合类的并发安全问题
     @Test
@@ -14,7 +50,7 @@ public class ListDemo {
         Random random = new Random();
 
         for (int i = 0; i < 10; i++) {
-            new Thread(()->{
+            new Thread(() -> {
                 list.add(String.valueOf(random.nextInt()));
                 System.out.println(list);
             }).start();
@@ -31,7 +67,7 @@ public class ListDemo {
         Random random = new Random();
 
         for (int i = 0; i < 10; i++) {
-            new Thread(()->{
+            new Thread(() -> {
                 list.add(String.valueOf(random.nextInt()));
                 System.out.println(list);
             }).start();
@@ -45,7 +81,7 @@ public class ListDemo {
         Random random = new Random();
 
         for (int i = 0; i < 10; i++) {
-            new Thread(()->{
+            new Thread(() -> {
                 list.add(String.valueOf(random.nextInt()));
                 System.out.println(list);
             }).start();
@@ -59,7 +95,7 @@ public class ListDemo {
         Random random = new Random();
 
         for (int i = 0; i < 10; i++) {
-            new Thread(()->{
+            new Thread(() -> {
                 list.add(String.valueOf(random.nextInt()));
                 System.out.println(list);
             }).start();

@@ -20,6 +20,7 @@ public class ReentrantLockDemo {
     }
 
     //演示ReentrantLock的可重入
+    @Test
     public void demo2() {
         Phone phone = new Phone();
 

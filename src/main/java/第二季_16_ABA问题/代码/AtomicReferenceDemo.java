@@ -34,6 +34,8 @@ public class AtomicReferenceDemo {
     //演示ABA问题
     @Test
     public void demo2() {
+
+        System.out.println("ABA问题产生");
         AtomicReference<Integer> atomicReference = new AtomicReference<>(100);
 
         new Thread(() -> {
@@ -41,79 +43,39 @@ public class AtomicReferenceDemo {
             System.out.println(atomicReference.compareAndSet(101, 100));
         }).start();
 
+        if (Thread.activeCount() > 1) {
+            Thread.yield();
+        }
         new Thread(() -> {
-            System.out.println(1);
-            //学到了新的暂停线程的方法
-            try {
-                System.out.println(2);
-                //这个类在并发包下
-                //停1s保证第一个线程执行完成
-                Thread.sleep(3000);
-                System.out.println(3);
-            } catch (InterruptedException e) {
-                System.out.println(4);
-                e.printStackTrace();
-            }
-            System.out.println(5);
-            System.out.println(atomicReference.compareAndSet(100, 200));
-            System.out.println(atomicReference.get());
+            System.out.println(atomicReference.compareAndSet(100, 2021));
+            System.out.println(atomicReference.get().toString());
         }).start();
 
-        //为什么什么也没有打印出来!!!
-        //只打印出了1，2
     }
 
-    //使用AtomicStampedReference类解决ABA问题
     @Test
     public void demo3() {
         AtomicStampedReference<Integer> atomicStampedReference = new AtomicStampedReference<>(100, 1);
 
+        int stamp = atomicStampedReference.getStamp();
         new Thread(() -> {
-            int stamp = atomicStampedReference.getStamp();
-            System.out.println("线程1：" + stamp);
+            System.out.println(Thread.currentThread().getName() + " 初始化当前版本号 " + stamp + " 当前值 " + atomicStampedReference.getReference());
+            System.out.println(Thread.currentThread().getName() + " 第一次对换结果: " + atomicStampedReference.compareAndSet(100, 101, stamp, stamp + 1));
+            System.out.println(Thread.currentThread().getName() + " 第一次对换后版本号 " + atomicStampedReference.getStamp() + " 当前值 " + atomicStampedReference.getReference());
+            System.out.println(Thread.currentThread().getName() + " 第二次对换结果: " + atomicStampedReference.compareAndSet(101, 100, atomicStampedReference.getStamp(), atomicStampedReference.getStamp() + 1));
+            System.out.println(Thread.currentThread().getName() + " 第二次对换后版本号 " + atomicStampedReference.getStamp() + " 当前值 " + atomicStampedReference.getReference());
+        }, "t1").start();
 
-            //停1s
-            try {
-                //这个类在并发包下
-                //停1s保证第一个线程执行完成
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            atomicStampedReference.compareAndSet(100,
-                    101,
-                    atomicStampedReference.getStamp(),
-                    atomicStampedReference.getStamp() + 1);
-            System.out.println("线程1：" + atomicStampedReference.getStamp());
-
-            atomicStampedReference.compareAndSet(101,
-                    100,
-                    atomicStampedReference.getStamp(),
-                    atomicStampedReference.getStamp() + 1);
-            System.out.println("线程1：" + atomicStampedReference.getStamp());
-        }).start();
-
+        if (Thread.activeCount() > 1) {
+            Thread.yield();
+        }
         new Thread(() -> {
-            int stamp = atomicStampedReference.getStamp();
-            System.out.println("线程2：" + stamp);
+            System.out.println(Thread.currentThread().getName() + " 第一次对换结果: " + atomicStampedReference.compareAndSet(100, 2021, stamp, stamp + 1));
+            System.out.println(Thread.currentThread().getName() + " 第一次对换后版本号 " + atomicStampedReference.getStamp() + " 当前值 " + atomicStampedReference.getReference());
+        }, "t2").start();
 
-            try {
-                //这个类在并发包下
-                //停1s保证第一个线程执行完成
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            //这里的时间戳一定要用一开始获取到的stamp
-            atomicStampedReference.compareAndSet(101,
-                    100,
-                    stamp,
-                    stamp + 1);
-            System.out.println("线程2：" + atomicStampedReference.getStamp());
-        }).start();
-
-        //打印也有问题
+        if (Thread.activeCount() > 1) {
+            Thread.yield();
+        }
     }
 }
