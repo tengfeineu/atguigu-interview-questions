@@ -40,7 +40,7 @@ public class SpinLockDemo {
             spinLockDemo.lock();
             //停3s模拟一个耗时操作
             try {
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
